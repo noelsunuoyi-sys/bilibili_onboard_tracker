@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bilibili Creator Onboarding Tracker</title>
+<style>
+  :root {
+    --pink: #FB7299;
+    --pink-light: #FFE4EC;
+    --pink-dark: #E85D82;
+    --black: #000000;
+    --white: #FFFFFF;
+    --gray: #F5F5F5;
+    --gray-dark: #888888;
+    --green: #4CAF50;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--white);
+    color: var(--black);
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .header p {
+    color: var(--gray-dark);
+    font-size: 0.95rem;
+    margin-top: 4px;
+  }
+
+  /* Progress Bar */
+  .progress-section {
+    margin-bottom: 30px;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .progress-label span {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gray-dark);
+  }
+  .progress-label .percent {
+    color: var(--pink);
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  .progress-bar-bg {
+    width: 100%;
+    height: 12px;
+    background: var(--gray);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--pink);
+    border-radius: 6px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+
+  /* Steps Grid */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 12px;
+    margin-bottom: 30px;
+  }
+
+  @media (max-width: 900px) {
+    .steps-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .steps-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .step-card {
+    background: var(--white);
+    border: 3px solid var(--pink);
+    border-radius: 12px;
+    padding: 16px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    user-select: none;
+  }
+  .step-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(251, 114, 153, 0.2);
+  }
+  .step-card.completed {
+    background: var(--pink-light);
+    border-color: var(--green);
+  }
+  .step-card.completed .step-number {
+    background: var(--green);
+    border-color: var(--green);
+  }
+  .step-card.completed .step-title {
+    color: var(--green);
+  }
+  .step-card.completed .check-icon {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .step-number {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    border-radius: 8px;
+    background: var(--pink);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 0.85rem;
+    border: 2px solid var(--black);
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+  }
+  .step-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .step-desc {
+    font-size: 0.7rem;
+    color: var(--gray-dark);
+    line-height: 1.4;
+  }
+  .check-icon {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background: var(--green);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s ease;
+    border: 2px solid var(--white);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+
+  /* Arrows between steps (desktop only) */
+  .step-arrow {
+    display: none;
+  }
+  @media (min-width: 901px) {
+    .steps-grid {
+      position: relative;
+    }
+    .step-arrow {
+      display: block;
+      position: absolute;
+      top: 30px;
+      color: var(--pink);
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .step-arrow.a1 { left: 13.5%; }
+    .step-arrow.a2 { left: 27.5%; }
+    .step-arrow.a3 { left: 41.5%; }
+    .step-arrow.a4 { left: 55.5%; }
+    .step-arrow.a5 { left: 69.5%; }
+    .step-arrow.a6 { left: 83.5%; }
+  }
+
+  /* Milestone Section */
+  .milestone {
+    background: var(--pink-light);
+    border: 2px solid var(--black);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .milestone-star {
+    font-size: 1.5rem;
+    color: var(--pink);
+    margin-bottom: 6px;
+  }
+  .milestone h3 {
+    font-size: 0.9rem;
+    color: var(--pink);
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .milestone h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .milestone p {
+    font-size: 0.8rem;
+    color: var(--gray-dark);
+  }
+  .milestone-locked {
+    opacity: 0.5;
+    filter: grayscale(0.6);
+  }
+  .milestone-locked::after {
+    content: "🔒 LOCKED";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.7);
+    color: var(--white);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  /* Detail Panel */
+  .detail-panel {
+    background: var(--gray);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    display: none;
+  }
+  .detail-panel.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .detail-panel h3 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    color: var(--pink);
+  }
+  .detail-panel ul {
+    list-style: none;
+    padding: 0;
+  }
+  .detail-panel li {
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .detail-panel li:last-child { border-bottom: none; }
+  .detail-panel li::before {
+    content: "•";
+    color: var(--pink);
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  .detail-panel .close-btn {
+    float: right;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--gray-dark);
+  }
+
+  /* Bottom Banner */
+  .banner {
+    background: var(--pink);
+    color: var(--white);
+    text-align: center;
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    border: 2px solid var(--black);
+  }
+
+  /* Reset Button */
+  .reset-btn {
+    display: block;
+    margin: 20px auto 0;
+    background: none;
+    border: 2px solid var(--pink);
+    color: var(--pink);
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .reset-btn:hover {
+    background: var(--pink);
+    color: var(--white);
+  }
+
+  /* Confetti */
+  .confetti {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1000;
+  }
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>BILIBILI CREATOR ONBOARDING</h1>
+    <p>Complete Journey from Registration to First Video</p>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="progress-section">
+    <div class="progress-label">
+      <span>Your Progress</span>
+      <span class="percent" id="progressPercent">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+  </div>
+
+  <!-- Steps Grid -->
+  <div class="steps-grid" id="stepsGrid">
+    <div class="step-arrow a1">→</div>
+    <div class="step-arrow a2">→</div>
+    <div class="step-arrow a3">→</div>
+    <div class="step-arrow a4">→</div>
+    <div class="step-arrow a5">→</div>
+    <div class="step-arrow a6">→</div>
+
+    <div class="step-card" data-step="1" onclick="toggleStep(1)">
+      <div class="check-icon">✓</div>
+      <div class="step-number">1</div>
+      <div class="step-title">Download<br>& Register</div>
+      <div class="step-desc">Download app & create account</div>
+    </div>
+
+    <div class="step-card" data-step="2" onclick="toggleStep(2)">
+      <div class="check-icon">✓</div>
+      <div class="step-number">2</div>
+      <div class="step-title">Profile<br>Setup</div>
+      <div class="step-desc">Username, avatar, bilingual bio</div>
+    </div>
+
+    <div class="step-card" data-step="3" onclick="toggleStep(3)">
+      <div class="check-icon">✓</div>
+      <div class="step-number">3</div>
+      <div class="step-title">Complete<br>Community Quiz</div>
+      <div class="step-desc">Pass rules & culture quiz</div>
+    </div>
+
+    <div class="step-card" data-step="4" onclick="toggleStep(4)">
+      <div class="check-icon">✓</div>
+      <div class="step-number">4</div>
+      <div class="step-title">Real-Name<br>Verification</div>
+      <div class="step-desc">Passport + selfie required</div>
+    </div>
+
+    <div class="step-card" data-step="5" onclick="toggleStep(5)">
+      <div class="check-icon">✓</div>
+      <div class="step-number">5</div>
+      <div class="step-title">Apply for<br>Upload Whitelist</div>
+      <div class="step-desc">Contact Creator Operations</div>
+    </div>
+
+    <div class="step-card" data-step="6" onclick="toggleStep(6)">
+      <div class="check-icon">✓</div>
+      <div class="step-number">6</div>
+      <div class="step-title">Create<br>Welcome Video</div>
+      <div class="step-desc">Self-introduction video</div>
+    </div>
+
+    <div class="step-card" data-step="7" onclick="toggleStep(7)">
+      <div class="check-icon">✓</div>
+      <div class="step-number">7</div>
+      <div class="step-title">Publish<br>& Grow</div>
+      <div class="step-desc">1-2 videos/week, engage</div>
+    </div>
+  </div>
+
+  <!-- Milestone -->
+  <div class="milestone" id="milestone">
+    <div class="milestone-star">★</div>
+    <h3>KEY MILESTONE</h3>
+    <h4>UNLOCK CREATOR CENTER</h4>
+    <p>Track Analytics • Apply for Monetization • Manage Content</p>
+  </div>
+
+  <!-- Detail Panel -->
+  <div class="detail-panel" id="detailPanel">
+    <button class="close-btn" onclick="closeDetail()">✕</button>
+    <h3 id="detailTitle">Step Details</h3>
+    <ul id="detailList"></ul>
+  </div>
+
+  <!-- Banner -->
+  <div class="banner">
+    START YOUR CREATOR JOURNEY ON BILIBILI!
+  </div>
+
+  <button class="reset-btn" onclick="resetAll()">Reset Progress</button>
+</div>
+
+<script>
+  const stepDetails = {
+    1: [
+      "Download the Bilibili app from App Store or Google Play",
+      "Create account using Phone, Gmail, Facebook, or Apple ID",
+      "Agree to privacy permissions and Terms of Service"
+    ],
+    2: [
+      "Choose a memorable username (2-10 characters)",
+      "Upload a high-quality avatar image",
+      "Write a bilingual bio (EN/ZH) introducing yourself and your niche"
+    ],
+    3: [
+      "Take the short quiz about Bilibili's community rules",
+      "Learn about platform culture and values",
+      "Pass to unlock full platform interactions"
+    ],
+    4: [
+      "Submit your passport for identity verification",
+      "Upload a selfie for facial verification",
+      "Unlocks content creation, monetization, and live streaming"
+    ],
+    5: [
+      "Contact your Creator Operations representative",
+      "Request upload whitelist access",
+      "Prevents risk-control flags on your uploads"
+    ],
+    6: [
+      "Film your first self-introduction video",
+      "Tell users who you are and what content you make",
+      "Explain why you're excited to be on Bilibili"
+    ],
+    7: [
+      "Upload consistently (1-2 videos per week)",
+      "Engage with audience through Danmu and comments",
+      "Leverage platform events to accelerate growth"
+    ]
+  };
+
+  let completedSteps = new Set();
+
+  function toggleStep(stepNum) {
+    const card = document.querySelector(`[data-step="${stepNum}"]`);
+
+    if (completedSteps.has(stepNum)) {
+      completedSteps.delete(stepNum);
+      card.classList.remove('completed');
+    } else {
+      completedSteps.add(stepNum);
+      card.classList.add('completed');
+
+      // Check if all steps complete
+      if (completedSteps.size === 7) {
+        triggerConfetti();
+      }
+    }
+
+    updateProgress();
+    updateMilestone();
+    showDetail(stepNum);
+    saveProgress();
+  }
+
+  function updateProgress() {
+    const percent = Math.round((completedSteps.size / 7) * 100);
+    document.getElementById('progressBar').style.width = percent + '%';
+    document.getElementById('progressPercent').textContent = percent + '%';
+  }
+
+  function updateMilestone() {
+    const milestone = document.getElementById('milestone');
+    if (completedSteps.has(4)) {
+      milestone.classList.remove('milestone-locked');
+    } else {
+      milestone.classList.add('milestone-locked');
+    }
+  }
+
+  function showDetail(stepNum) {
+    const panel = document.getElementById('detailPanel');
+    const title = document.getElementById('detailTitle');
+    const list = document.getElementById('detailList');
+
+    const titles = {
+      1: "Step 1: Download & Register",
+      2: "Step 2: Profile Setup",
+      3: "Step 3: Complete Community Quiz",
+      4: "Step 4: Real-Name Verification",
+      5: "Step 5: Apply for Upload Whitelist",
+      6: "Step 6: Create Welcome Video",
+      7: "Step 7: Publish & Grow"
+    };
+
+    title.textContent = titles[stepNum];
+    list.innerHTML = stepDetails[stepNum].map(item => `<li>${item}</li>`).join('');
+    panel.classList.add('active');
+  }
+
+  function closeDetail() {
+    document.getElementById('detailPanel').classList.remove('active');
+  }
+
+  function resetAll() {
+    completedSteps.clear();
+    document.querySelectorAll('.step-card').forEach(card => card.classList.remove('completed'));
+    updateProgress();
+    updateMilestone();
+    closeDetail();
+    saveProgress();
+  }
+
+  function saveProgress() {
+    localStorage.setItem('bilibili_onboarding', JSON.stringify([...completedSteps]));
+  }
+
+  function loadProgress() {
+    const saved = localStorage.getItem('bilibili_onboarding');
+    if (saved) {
+      const steps = JSON.parse(saved);
+      steps.forEach(step => {
+        completedSteps.add(step);
+        document.querySelector(`[data-step="${step}"]`).classList.add('completed');
+      });
+      updateProgress();
+      updateMilestone();
+    }
+  }
+
+  // Confetti effect
+  function triggerConfetti() {
+    const colors = ['#FB7299', '#4CAF50', '#FFD700', '#FF6B6B', '#4ECDC4'];
+    for (let i = 0; i < 50; i++) {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.top = '-10px';
+      confetti.style.width = Math.random() * 10 + 5 + 'px';
+      confetti.style.height = Math.random() * 10 + 5 + 'px';
+      confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.borderRadius = '50%';
+      confetti.style.animation = `fall ${Math.random() * 2 + 2}s linear forwards`;
+      document.body.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 4000);
+    }
+  }
+
+  // Add confetti animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fall {
+      to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Initialize
+  loadProgress();
+</script>
+
+</body>
+</html>
